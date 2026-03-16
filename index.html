@@ -165,7 +165,7 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;}
 <body>
 
 <div id="login-screen">
-  <h1>🔥 Calendar Arderi</h1>
+  <h1>🔥 Calendar</h1>
   <p>Enter your team password to continue</p>
   <div class="login-box">
     <label>Password</label>
@@ -177,7 +177,7 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;}
 
 <div id="app">
   <div class="top-bar">
-    <h1>🔥 Calendar Arderi</h1>
+    <h1>🔥 Calendar</h1>
     <div class="view-tabs">
       <button class="vtab active" onclick="switchView('calendar')" id="tab-calendar">Calendar</button>
       <button class="vtab" onclick="switchView('history')" id="tab-history">History</button>
@@ -202,7 +202,7 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="months-wrap" id="months-wrap"><div class="loading">Loading orders…</div></div>
     <div class="bottom-btns">
       <button class="add-btn" onclick="openAddOrderModal()">+ New order</button>
-      <button class="add-btn" onclick="openAddFiringModal()">+ Firing day</button>
+      <button class="add-btn" onclick="openAddFiringModal()">+ Kiln</button>
     </div>
   </div>
 
@@ -399,7 +399,7 @@ window.openDayModal=function(ds){
       </div>
       <div class="action-card" onclick="closeModal();openAddFiringModal('${ds}')">
         <div class="action-icon">🔥</div>
-        <div><div class="action-label">Firing day</div><div class="action-sub">Schedule a firing on this day</div></div>
+        <div><div class="action-label">Kiln</div><div class="action-sub">Schedule a firing on this day</div></div>
       </div>
     </div>`;
   showModal(`<h3>${label}</h3>${eventsHtml}${actionsHtml}`);
@@ -438,7 +438,7 @@ window.openEditFiringModal=function(ds){
       ${boxes||'<div style="color:var(--text3);font-size:13px;">No active orders.</div>'}
     </div>
     <button class="submit-btn" id="ef-submit-btn" onclick="saveEditFiring('${ds}')">Save changes</button>
-    <button class="danger-btn" onclick="deleteFiring('${ds}')">Remove this firing day</button>`);
+    <button class="danger-btn" onclick="deleteFiring('${ds}')">Remove this kiln</button>`);
 };
 
 window.saveEditFiring=async function(ds){
@@ -457,14 +457,14 @@ window.saveEditFiring=async function(ds){
 };
 
 window.deleteFiring=async function(ds){
-  if(!confirm('Remove this firing day from all orders?'))return;
+  if(!confirm('Remove this kiln from all orders?'))return;
   try{
     await Promise.all(orders.filter(o=>o.firings&&o.firings[ds]).map(o=>{
       const f={...(o.firings||{})};
       delete f[ds];
       return updateOrder(o.id,{firings:f});
     }));
-    closeModal();toast('Firing day removed');
+    closeModal();toast('Kiln removed');
   }catch(e){alert('Error: '+e.message);}
 };
 
@@ -499,14 +499,14 @@ window.openOrderDetail=function(id){
       const lb={bisque:'Bisque',glaze:'Glaze','gold-fire':'Gold/Platinum',correction:'Correction'};
       return `<div class="firing-row"><span class="ftag ${type}">${lb[type]}</span><span style="font-size:12px;color:var(--text2);">${fmtDisp(date)}</span></div>`;
     }).join('')
-    :`<div style="color:var(--text3);font-size:12px;padding:4px 0;">No firing days yet.</div>`;
+    :`<div style="color:var(--text3);font-size:12px;padding:4px 0;">No kilns yet.</div>`;
   showModal(`
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
       <h3 style="margin-bottom:0;">${esc(o.name)}</h3>
       <button class="edit-btn" onclick="openEditModal('${o.id}')">Edit</button>
     </div>
     <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
-      <span style="font-size:12px;padding:3px 10px;border-radius:10px;border:0.5px solid ${o.type==='gold'?'var(--gold-border)':'var(--plat-border)'};background:${o.type==='gold'?'var(--gold-bg)':'var(--plat-bg)'};color:${o.type==='gold'?'#8a6800':'#4a6070'};">${o.type==='gold'?'Gold/classic':'Platinum'}</span>
+      <span style="font-size:12px;padding:3px 10px;border-radius:10px;border:0.5px solid ${o.type==='gold'?'var(--gold-border)':'var(--plat-border)'};background:${o.type==='gold'?'var(--gold-bg)':'var(--plat-bg)'};color:${o.type==='gold'?'#8a6800':'#4a6070'};">${o.type==='gold'?'Gold':'Platinum'}</span>
       <span style="font-size:13px;color:var(--text2);">${esc(o.customer)}</span>
     </div>
     <p class="section-label">Photos</p>
@@ -520,7 +520,7 @@ window.openOrderDetail=function(id){
     <p class="section-label">Firing schedule</p>
     <div style="margin-bottom:12px;">${firingList}</div>
     <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;">${chips}</div>
-    <button class="add-btn" style="margin-top:0;" onclick="closeModal();openAddFiringModal('',${JSON.stringify(id)})">+ Add firing day</button>
+    <button class="add-btn" style="margin-top:0;" onclick="closeModal();openAddFiringModal('',${JSON.stringify(id)})">+ Add kiln</button>
     <button class="submit-btn" onclick="toggleComplete(${JSON.stringify(id)})">${o.completed?'Mark as active':'Mark as completed'}</button>
     <button class="danger-btn" onclick="doDelete(${JSON.stringify(id)})">Delete order</button>`);
 };
@@ -545,7 +545,7 @@ window.openEditModal=function(id){
     <div class="form-group"><label class="form-label">Customer name</label><input class="form-input" id="e-customer" value="${esc(o.customer)}" /></div>
     <div class="form-group"><label class="form-label">Finish type</label>
       <div class="radio-group">
-        <div class="radio-opt${o.type==='gold'?' sel-gold':''}" id="eopt-gold" onclick="selType('gold','eopt-gold','eopt-plat')">Gold / classic</div>
+        <div class="radio-opt${o.type==='gold'?' sel-gold':''}" id="eopt-gold" onclick="selType('gold','eopt-gold','eopt-plat')">Gold</div>
         <div class="radio-opt${o.type==='platinum'?' sel-plat':''}" id="eopt-plat" onclick="selType('platinum','eopt-gold','eopt-plat')">Platinum</div>
       </div>
     </div>
@@ -588,7 +588,7 @@ window.openAddOrderModal=function(dateStr=''){
     <div class="form-group"><label class="form-label">Customer name</label><input class="form-input" id="f-customer" placeholder="e.g. Maria P." /></div>
     <div class="form-group"><label class="form-label">Finish type</label>
       <div class="radio-group">
-        <div class="radio-opt" id="opt-gold" onclick="selType('gold','opt-gold','opt-plat')">Gold / classic</div>
+        <div class="radio-opt" id="opt-gold" onclick="selType('gold','opt-gold','opt-plat')">Gold</div>
         <div class="radio-opt" id="opt-plat" onclick="selType('platinum','opt-gold','opt-plat')">Platinum</div>
       </div>
     </div>
@@ -624,7 +624,7 @@ window.openAddFiringModal=function(preDate='',preOrderId=null){
     <span style="font-size:11px;color:var(--text3);">${esc(o.customer)}</span>
     <span class="dot ${o.type==='gold'?'gold':'platinum'}" style="flex-shrink:0;"></span>
   </label>`).join('');
-  showModal(`<h3>Add firing day</h3>
+  showModal(`<h3>Add kiln</h3>
     <div class="form-group"><label class="form-label">Firing date</label><input class="form-input" type="date" id="ff-date" value="${preDate||today()}" /></div>
     <div class="form-group"><label class="form-label">Firing type</label>
       <div class="fire-grid">
@@ -637,7 +637,7 @@ window.openAddFiringModal=function(preDate='',preOrderId=null){
     <div class="form-group"><label class="form-label">Pendants in this firing</label>
       ${boxes||'<div style="color:var(--text3);font-size:13px;padding:8px 0;">No active orders.</div>'}
     </div>
-    <button class="submit-btn" id="ff-submit-btn" onclick="submitFiring()">Save firing day</button>`);
+    <button class="submit-btn" id="ff-submit-btn" onclick="submitFiring()">Save kiln</button>`);
 };
 
 window.submitFiring=async function(){
@@ -651,8 +651,8 @@ window.submitFiring=async function(){
       const o=orders.find(x=>x.id===id);if(!o)return;
       return updateOrder(id,{firings:{...(o.firings||{}),[date]:selectedFire}});
     }));
-    closeModal();toast('Firing day saved!');
-  }catch(e){btn.textContent='Save firing day';btn.disabled=false;alert('Error: '+e.message);}
+    closeModal();toast('Kiln saved!');
+  }catch(e){btn.textContent='Save kiln';btn.disabled=false;alert('Error: '+e.message);}
 };
 
 // ── Etsy import ──
