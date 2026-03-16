@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<meta name="apple-mobile-web-app-title" content="Kiln Calendar" />
+<title>Kiln Calendar</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --gold-bg:#fffbea;--gold-border:#e6b800;
+  --plat-bg:#f0f4f8;--plat-border:#9bb0c4;
+  --bg:#ffffff;--bg2:#f5f5f4;--bg3:#fafaf9;
+  --text:#1c1917;--text2:#78716c;--text3:#a8a29e;
+  --border:#e7e5e4;--border2:#d6d3d1;
+  --radius:10px;--radius-sm:6px;
+}
+@media(prefers-color-scheme:dark){
+  :root{
+    --bg:#1c1917;--bg2:#292524;--bg3:#0c0a09;
+    --text:#fafaf9;--text2:#a8a29e;--text3:#78716c;
+    --border:#292524;--border2:#44403c;
+  }
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;}
+#app{max-width:540px;margin:0 auto;padding:16px 12px 80px;}
+.top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.top-bar h1{font-size:18px;font-weight:600;letter-spacing:-.3px;}
+.view-tabs{display:flex;gap:4px;background:var(--bg2);padding:3px;border-radius:20px;}
+.vtab{font-size:12px;padding:5px 14px;border-radius:16px;border:none;background:none;color:var(--text2);cursor:pointer;transition:all .15s;font-weight:500;}
+.vtab.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12);}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:10px 12px;background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border);}
+.legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.legend-dot{width:10px;height:10px;border-radius:2px;border:2px solid;flex-shrink:0;}
+.ftag{font-size:9px;padding:1px 5px;border-radius:3px;font-weight:600;}
+.ftag.bisque{background:#fff3e0;color:#b26200;border:0.5px solid #f0a500;}
+.ftag.glaze{background:#e8f5e9;color:#2e7d32;border:0.5px solid #4caf50;}
+.ftag.gold-fire{background:#fffbea;color:#8a6800;border:0.5px solid #e6b800;}
+.ftag.correction{background:#fce4ec;color:#b71c1c;border:0.5px solid #ef9a9a;}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.nav-btn{background:var(--bg2);border:0.5px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
+.months-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.month-block h2{font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px;text-align:center;letter-spacing:.08em;text-transform:uppercase;}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px;}
+.weekdays span{font-size:9px;color:var(--text3);text-align:center;}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
+.day-cell{min-height:36px;border-radius:5px;padding:2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:background .1s;}
+.day-cell:hover{background:var(--bg2);}
+.day-cell.empty{cursor:default;pointer-events:none;}
+.day-cell.today .day-num{background:var(--text);color:var(--bg);border-radius:50%;}
+.day-num{font-size:10px;color:var(--text2);width:18px;height:18px;display:flex;align-items:center;justify-content:center;}
+.dots-row{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;margin-top:1px;}
+.dot{width:7px;height:7px;border-radius:2px;border:2px solid transparent;flex-shrink:0;}
+.dot.gold{border-color:var(--gold-border);background:var(--gold-bg);}
+.dot.platinum{border-color:var(--plat-border);background:var(--plat-bg);}
+.dot.start{opacity:.5;}
+.day-ftag{font-size:7px;padding:1px 2px;border-radius:2px;margin-top:1px;font-weight:600;white-space:nowrap;}
+.day-ftag.bisque{background:#fff3e0;color:#b26200;}
+.day-ftag.glaze{background:#e8f5e9;color:#2e7d32;}
+.day-ftag.gold-fire{background:#fffbea;color:#8a6800;}
+.day-ftag.correction{background:#fce4ec;color:#b71c1c;}
+.bottom-btns{display:flex;gap:8px;margin-top:16px;}
+.add-btn{flex:1;padding:11px;border-radius:var(--radius);border:0.5px dashed var(--border2);background:none;color:var(--text2);cursor:pointer;font-size:13px;font-family:inherit;transition:background .1s;}
+.add-btn:hover{background:var(--bg2);}
+.hist-filter{display:flex;gap:6px;margin-bottom:12px;flex-wrap:wrap;}
+.hf-btn{font-size:12px;padding:5px 12px;border-radius:20px;border:0.5px solid var(--border2);background:var(--bg);color:var(--text2);cursor:pointer;font-family:inherit;}
+.hf-btn.active{background:var(--text);color:var(--bg);border-color:var(--text);}
+.history-wrap{display:flex;flex-direction:column;gap:8px;}
+.hist-card{border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;display:flex;gap:10px;align-items:flex-start;background:var(--bg);transition:background .1s;}
+.hist-card:hover{background:var(--bg2);}
+.hist-card.gold-order{border-left:3px solid var(--gold-border);}
+.hist-card.plat-order{border-left:3px solid var(--plat-border);}
+.hist-thumb{width:44px;height:44px;border-radius:var(--radius-sm);flex-shrink:0;background:var(--bg2);border:0.5px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:22px;}
+.hist-thumb img{width:100%;height:100%;object-fit:cover;}
+.hist-name{font-size:13px;font-weight:500;color:var(--text);}
+.hist-meta{font-size:11px;color:var(--text2);margin-top:2px;}
+.hist-chips{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.chip{font-size:10px;padding:2px 7px;border-radius:10px;background:var(--bg2);color:var(--text3);border:0.5px solid var(--border);}
+.chip.done{background:#e8f5e9;color:#2e7d32;border-color:#4caf50;}
+.chip.chip-active{background:#e3f2fd;color:#1565c0;border-color:#90caf9;}
+.chip.overdue{background:#fce4ec;color:#b71c1c;border-color:#ef9a9a;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:100;}
+.modal{background:var(--bg);border-radius:20px 20px 0 0;width:100%;max-width:540px;padding:20px 16px;max-height:92vh;overflow-y:auto;}
+.modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px;}
+.modal-close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);margin-top:-4px;line-height:1;}
+.modal h3{font-size:16px;font-weight:600;margin-bottom:14px;}
+.section-label{font-size:11px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin:14px 0 6px;}
+.photo-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(76px,1fr));gap:8px;margin-bottom:14px;}
+.photo-item{aspect-ratio:1;border-radius:var(--radius-sm);overflow:hidden;border:0.5px solid var(--border);background:var(--bg2);display:flex;align-items:center;justify-content:center;cursor:pointer;position:relative;}
+.photo-item img{width:100%;height:100%;object-fit:cover;}
+.del-photo{position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:rgba(0,0,0,.6);color:#fff;border:none;font-size:13px;cursor:pointer;display:none;align-items:center;justify-content:center;line-height:1;}
+.photo-item:hover .del-photo{display:flex;}
+.upload-zone{border:0.5px dashed var(--border2);border-radius:var(--radius-sm);padding:12px 8px;text-align:center;cursor:pointer;font-size:12px;color:var(--text3);aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;transition:background .1s;}
+.upload-zone:hover{background:var(--bg2);}
+.inst-box{background:var(--bg2);border-radius:var(--radius);padding:10px 12px;font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px;border:0.5px solid var(--border);}
+.inst-box.empty{color:var(--text3);font-style:italic;}
+.ocard{border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;margin-bottom:8px;cursor:pointer;background:var(--bg);transition:background .1s;display:flex;gap:10px;align-items:flex-start;}
+.ocard:hover{background:var(--bg2);}
+.ocard.gold-order{border-left:3px solid var(--gold-border);}
+.ocard.plat-order{border-left:3px solid var(--plat-border);}
+.ocard-info{flex:1;min-width:0;}
+.ocard-title{font-size:13px;font-weight:500;}
+.ocard-meta{font-size:11px;color:var(--text2);margin-top:2px;}
+.ocard-chips{display:flex;gap:4px;margin-top:5px;flex-wrap:wrap;}
+.sc{padding:2px 7px;border-radius:10px;background:var(--bg2);color:var(--text2);border:0.5px solid var(--border);font-size:10px;}
+.sc.done{background:#e8f5e9;color:#2e7d32;border-color:#4caf50;}
+.form-group{margin-bottom:12px;}
+.form-label{font-size:12px;color:var(--text2);margin-bottom:4px;display:block;font-weight:500;}
+.form-input{width:100%;padding:9px 11px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg);color:var(--text);font-size:14px;font-family:inherit;outline:none;transition:border .1s;}
+.form-input:focus{border-color:var(--text2);}
+textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;}
+.radio-group{display:flex;gap:8px;}
+.radio-opt{flex:1;text-align:center;font-size:13px;cursor:pointer;padding:9px 8px;border-radius:var(--radius);border:0.5px solid var(--border);transition:all .1s;font-family:inherit;}
+.radio-opt.sel-gold{border-color:var(--gold-border);background:var(--gold-bg);color:#8a6800;}
+.radio-opt.sel-plat{border-color:var(--plat-border);background:var(--plat-bg);color:#4a6070;}
+.submit-btn{width:100%;padding:12px;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius);font-size:14px;font-family:inherit;cursor:pointer;margin-top:6px;font-weight:500;}
+.submit-btn:hover{opacity:.88;}
+.danger-btn{width:100%;padding:10px;background:none;color:#b71c1c;border:0.5px solid #ef9a9a;border-radius:var(--radius);font-size:13px;font-family:inherit;cursor:pointer;margin-top:6px;}
+.danger-btn:hover{background:#fce4ec;}
+.edit-btn{background:none;border:0.5px solid var(--border2);border-radius:var(--radius-sm);padding:5px 12px;font-size:12px;cursor:pointer;color:var(--text2);font-family:inherit;}
+.fire-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px;}
+.fire-opt{padding:10px;border-radius:var(--radius);border:0.5px solid var(--border);text-align:center;cursor:pointer;font-size:13px;font-weight:500;transition:all .1s;font-family:inherit;background:var(--bg);}
+.fire-opt:hover{background:var(--bg2);}
+.fire-opt.sel-bisque{background:#fff3e0;color:#b26200;border-color:#f0a500;}
+.fire-opt.sel-glaze{background:#e8f5e9;color:#2e7d32;border-color:#4caf50;}
+.fire-opt.sel-gold-fire{background:#fffbea;color:#8a6800;border-color:#e6b800;}
+.fire-opt.sel-correction{background:#fce4ec;color:#b71c1c;border-color:#ef9a9a;}
+.order-check{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:var(--radius);border:0.5px solid var(--border);margin-bottom:6px;font-size:13px;background:var(--bg);}
+.etsy-bar{display:flex;gap:8px;margin-bottom:8px;}
+.etsy-bar input{flex:1;}
+.etsy-btn{padding:9px 14px;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius);font-size:13px;font-family:inherit;cursor:pointer;white-space:nowrap;font-weight:500;}
+.etsy-btn:disabled{opacity:.45;cursor:default;}
+.etsy-status{font-size:12px;min-height:16px;margin-bottom:10px;}
+.divider{height:0.5px;background:var(--border);margin:14px 0;}
+.fullimg-ov{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.fullimg-ov img{max-width:94vw;max-height:90vh;border-radius:8px;}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 20px;border-radius:20px;font-size:13px;z-index:300;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;}
+.loading{text-align:center;padding:3rem;color:var(--text3);font-size:14px;}
+.firing-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);}
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="top-bar">
+    <h1>🔥 Kiln Calendar</h1>
+    <div class="view-tabs">
+      <button class="vtab active" onclick="switchView('calendar')" id="tab-calendar">Calendar</button>
+      <button class="vtab" onclick="switchView('history')" id="tab-history">History</button>
+    </div>
+  </div>
+
+  <div id="view-calendar">
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="border-color:var(--gold-border);background:var(--gold-bg)"></div>Gold</div>
+      <div class="legend-item"><div class="legend-dot" style="border-color:var(--plat-border);background:var(--plat-bg)"></div>Platinum</div>
+      <div style="width:1px;height:12px;background:var(--border);margin:0 2px;"></div>
+      <div class="legend-item"><span class="ftag bisque">B</span>Bisque</div>
+      <div class="legend-item"><span class="ftag glaze">G</span>Glaze</div>
+      <div class="legend-item"><span class="ftag gold-fire">Au</span>Gold/Plat</div>
+      <div class="legend-item"><span class="ftag correction">C</span>Correction</div>
+    </div>
+    <div class="nav">
+      <button class="nav-btn" onclick="shiftMonths(-1)">&#8249;</button>
+      <span id="month-label" style="font-size:13px;color:var(--text2);font-weight:500;"></span>
+      <button class="nav-btn" onclick="shiftMonths(1)">&#8250;</button>
+    </div>
+    <div class="months-wrap" id="months-wrap"><div class="loading">Loading orders…</div></div>
+    <div class="bottom-btns">
+      <button class="add-btn" onclick="openAddOrderModal()">+ New order</button>
+      <button class="add-btn" onclick="openAddFiringModal()">+ Firing day</button>
+    </div>
+  </div>
+
+  <div id="view-history" style="display:none;">
+    <div class="hist-filter">
+      <button class="hf-btn active" onclick="setFilter('all')" id="hf-all">All</button>
+      <button class="hf-btn" onclick="setFilter('active')" id="hf-active">Active</button>
+      <button class="hf-btn" onclick="setFilter('done')" id="hf-done">Completed</button>
+      <button class="hf-btn" onclick="setFilter('gold')" id="hf-gold">Gold</button>
+      <button class="hf-btn" onclick="setFilter('platinum')" id="hf-plat">Platinum</button>
+    </div>
+    <div class="history-wrap" id="history-wrap"><div class="loading">Loading…</div></div>
+  </div>
+</div>
+<div id="modal-root"></div>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBuKHvlwCCwp-R8vwjwG3y4lBa4Ui8GhjM",
+  authDomain: "calendar-arderi.firebaseapp.com",
+  projectId: "calendar-arderi",
+  storageBucket: "calendar-arderi.firebasestorage.app",
+  messagingSenderId: "928635678896",
+  appId: "1:928635678896:web:ec178ccfd39eae9b648b75"
+};
+
+const fbApp = initializeApp(firebaseConfig);
+const db = getFirestore(fbApp);
+const storage = getStorage(fbApp);
+
+const MONTHS=['January','February','March','April','May','June','July','August','September','October','November','December'];
+const WDAYS=['Mo','Tu','We','Th','Fr','Sa','Su'];
+let baseMonth=new Date().getMonth(), baseYear=new Date().getFullYear();
+let histFilter='all', selectedType=null, selectedFire=null, pendingPhotos=[];
+let orders=[];
+let editingOrderId=null;
+
+function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
+function addDays(d,n){let x=new Date(d);x.setDate(x.getDate()+n);return x;}
+function today(){return fmtDate(new Date());}
+function parseD(s){return new Date(s+'T12:00:00');}
+function fmtDisp(s){const d=parseD(s);return d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3)+' '+d.getFullYear();}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+// ── Firestore real-time listener ──
+const q = query(collection(db,'orders'), orderBy('start','desc'));
+onSnapshot(q, snap => {
+  orders = snap.docs.map(d=>({id:d.id,...d.data()}));
+  renderCalendar();
+  if(document.getElementById('view-history').style.display!=='none') renderHistory();
+});
+
+async function saveOrder(data){
+  await addDoc(collection(db,'orders'), data);
+}
+async function updateOrder(id, data){
+  await updateDoc(doc(db,'orders',id), data);
+}
+async function removeOrder(id){
+  await deleteDoc(doc(db,'orders',id));
+}
+
+async function uploadPhoto(file){
+  const ext=file.name.split('.').pop();
+  const path=`photos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
+  const storageRef=ref(storage,path);
+  await uploadBytes(storageRef,file);
+  return await getDownloadURL(storageRef);
+}
+
+// ── Views ──
+window.switchView = function(v){
+  document.getElementById('view-calendar').style.display=v==='calendar'?'':'none';
+  document.getElementById('view-history').style.display=v==='history'?'':'none';
+  document.getElementById('tab-calendar').classList.toggle('active',v==='calendar');
+  document.getElementById('tab-history').classList.toggle('active',v==='history');
+  if(v==='history') renderHistory();
+};
+
+window.setFilter = function(f){
+  histFilter=f;
+  ['all','active','done','gold','plat'].forEach(x=>{const el=document.getElementById('hf-'+x);if(el)el.classList.remove('active');});
+  document.getElementById('hf-'+f).classList.add('active');
+  renderHistory();
+};
+
+function renderHistory(){
+  let list=[...orders];
+  if(histFilter==='active') list=list.filter(o=>!o.completed);
+  else if(histFilter==='done') list=list.filter(o=>o.completed);
+  else if(histFilter==='gold') list=list.filter(o=>o.type==='gold');
+  else if(histFilter==='platinum') list=list.filter(o=>o.type==='platinum');
+  const wrap=document.getElementById('history-wrap');
+  if(!list.length){wrap.innerHTML='<div class="loading">No orders found.</div>';return;}
+  wrap.innerHTML=list.map(o=>{
+    const fd=Object.values(o.firings||{});
+    const prog=['bisque','glaze','gold-fire'].map(f=>`<span class="chip${fd.includes(f)?' done':''}">${f==='gold-fire'?'Au':f.charAt(0).toUpperCase()}</span>`).join('');
+    const sl=o.completed?'<span class="chip done">Done</span>':parseD(o.deadline)<new Date()?'<span class="chip overdue">Overdue</span>':'<span class="chip chip-active">Active</span>';
+    const thumb=o.photos&&o.photos.length?`<div class="hist-thumb"><img src="${o.photos[0]}" onerror="this.parentNode.innerHTML='🐾'" /></div>`:`<div class="hist-thumb">🐾</div>`;
+    return `<div class="hist-card ${o.type}-order" onclick="openOrderDetail('${o.id}')">
+      ${thumb}
+      <div style="flex:1;min-width:0;">
+        <div class="hist-name">${esc(o.name)}</div>
+        <div class="hist-meta">${esc(o.customer)} · ${fmtDisp(o.start)} → ${fmtDisp(o.deadline)}</div>
+        <div class="hist-chips">${sl}${prog}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── Calendar ──
+window.shiftMonths = function(d){
+  baseMonth+=d;
+  if(baseMonth>11){baseMonth=0;baseYear++;}
+  if(baseMonth<0){baseMonth=11;baseYear--;}
+  renderCalendar();
+};
+
+function renderCalendar(){
+  const m1=baseMonth,y1=baseYear,m2=m1===11?0:m1+1,y2=m1===11?y1+1:y1;
+  document.getElementById('month-label').textContent=MONTHS[m1]+' – '+MONTHS[m2];
+  document.getElementById('months-wrap').innerHTML=renderMonth(y1,m1)+renderMonth(y2,m2);
+}
+
+function renderMonth(year,month){
+  const dim=new Date(year,month+1,0).getDate();
+  let fdow=new Date(year,month,1).getDay();fdow=fdow===0?6:fdow-1;
+  let cells='';
+  for(let i=0;i<fdow;i++) cells+='<div class="day-cell empty"></div>';
+  for(let d=1;d<=dim;d++){
+    const ds=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
+    const isToday=ds===today();
+    const oS=orders.filter(o=>o.start===ds), oD=orders.filter(o=>o.deadline===ds);
+    const firings={};
+    orders.forEach(o=>{if(o.firings&&o.firings[ds]){if(!firings[o.firings[ds]])firings[o.firings[ds]]=0;firings[o.firings[ds]]++;}});
+    let dots='';
+    oS.forEach(o=>{dots+=`<div class="dot ${o.type} start"></div>`;});
+    oD.forEach(o=>{dots+=`<div class="dot ${o.type}"></div>`;});
+    let ftags='';
+    Object.keys(firings).forEach(t=>{const lb={bisque:'B',glaze:'G','gold-fire':'Au',correction:'C'};ftags+=`<div class="day-ftag ${t}">${lb[t]}</div>`;});
+    const has=oS.length||oD.length||Object.keys(firings).length;
+    cells+=`<div class="day-cell${isToday?' today':''}${!has?' empty':''}" ${has?`onclick="openDayModal('${ds}')"`:''}><span class="day-num">${d}</span><div class="dots-row">${dots}</div>${ftags}</div>`;
+  }
+  return `<div class="month-block"><h2>${MONTHS[month]} ${year}</h2><div class="weekdays">${WDAYS.map(w=>`<span>${w}</span>`).join('')}</div><div class="days-grid">${cells}</div></div>`;
+}
+
+// ── Day modal ──
+window.openDayModal = function(ds){
+  const d=parseD(ds);
+  const label=d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
+  const oS=orders.filter(o=>o.start===ds), oD=orders.filter(o=>o.deadline===ds);
+  const fOrders=orders.filter(o=>o.firings&&o.firings[ds]);
+  let html='';
+  if(fOrders.length){
+    const ft=fOrders[0].firings[ds];
+    const fn={bisque:'Bisque firing',glaze:'Glaze firing','gold-fire':'Gold/Platinum firing',correction:'Correction firing'};
+    html+=`<p class="section-label">${fn[ft]||ft} — ${fOrders.length} pendant${fOrders.length>1?'s':''}</p>`;
+    fOrders.forEach(o=>{html+=miniCard(o,o.firings[ds]);});
+  }
+  if(oS.length||oD.length){
+    if(fOrders.length) html+=`<div class="divider"></div>`;
+    const shown=new Set();
+    [...oS,...oD].forEach(o=>{if(!shown.has(o.id)){shown.add(o.id);html+=miniCard(o,o.start===ds?'Received':'Deadline');}});
+  }
+  if(!html) html='<div class="loading">Nothing scheduled.</div>';
+  showModal(`<h3>${label}</h3>${html}
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="add-btn" style="margin-top:0;" onclick="closeModal();openAddOrderModal('${ds}')">+ Order</button>
+      <button class="add-btn" style="margin-top:0;" onclick="closeModal();openAddFiringModal('${ds}')">+ Firing</button>
+    </div>`);
+};
+
+function miniCard(o,badge){
+  const fd=Object.values(o.firings||{});
+  const chips=['bisque','glaze','gold-fire'].map(f=>`<span class="sc${fd.includes(f)?' done':''}">${f==='gold-fire'?'Gold/Plat':f.charAt(0).toUpperCase()+f.slice(1)}</span>`).join('');
+  const thumb=o.photos&&o.photos.length?`<img src="${o.photos[0]}" style="width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;" onerror="this.remove()" />`:'';
+  return `<div class="ocard ${o.type}-order" onclick="openOrderDetail('${o.id}')">
+    ${thumb}
+    <div class="ocard-info">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div class="ocard-title">${esc(o.name)}</div>
+        <span style="font-size:10px;padding:2px 6px;border-radius:10px;background:var(--bg2);color:var(--text3);border:0.5px solid var(--border);flex-shrink:0;margin-left:6px;">${badge}</span>
+      </div>
+      <div class="ocard-meta">${esc(o.customer)} · Deadline ${fmtDisp(o.deadline)}</div>
+      <div class="ocard-chips">${chips}</div>
+      ${o.instructions?`<div style="font-size:11px;color:var(--text3);margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(o.instructions).slice(0,55)}…</div>`:''}
+    </div>
+  </div>`;
+}
+
+// ── Order detail ──
+window.openOrderDetail = function(id){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  const photos=(o.photos&&o.photos.length)
+    ?o.photos.map(p=>`<div class="photo-item" onclick="openFullImg('${p}')"><img src="${p}" onerror="this.parentNode.innerHTML='🐾'" /></div>`).join('')
+    :`<div class="photo-item" style="font-size:32px;">🐾</div>`;
+  const fd=Object.values(o.firings||{});
+  const chips=['bisque','glaze','gold-fire'].map(f=>`<span class="sc${fd.includes(f)?' done':''}">${f==='gold-fire'?'Gold/Plat':f.charAt(0).toUpperCase()+f.slice(1)}</span>`).join('');
+  const firingList=Object.keys(o.firings||{}).length
+    ?Object.entries(o.firings).sort((a,b)=>a[0].localeCompare(b[0])).map(([date,type])=>{
+      const lb={bisque:'Bisque',glaze:'Glaze','gold-fire':'Gold/Platinum',correction:'Correction'};
+      return `<div class="firing-row"><span class="ftag ${type}">${lb[type]}</span><span style="font-size:12px;color:var(--text2);">${fmtDisp(date)}</span></div>`;
+    }).join('')
+    :`<div style="color:var(--text3);font-size:12px;padding:4px 0;">No firing days yet.</div>`;
+  showModal(`
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;">
+      <h3 style="margin-bottom:0;">${esc(o.name)}</h3>
+      <button class="edit-btn" onclick="openEditModal('${o.id}')">Edit</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
+      <span style="font-size:12px;padding:3px 10px;border-radius:10px;border:0.5px solid ${o.type==='gold'?'var(--gold-border)':'var(--plat-border)'};background:${o.type==='gold'?'var(--gold-bg)':'var(--plat-bg)'};color:${o.type==='gold'?'#8a6800':'#4a6070'};">${o.type==='gold'?'Gold/classic':'Platinum'}</span>
+      <span style="font-size:13px;color:var(--text2);">${esc(o.customer)}</span>
+    </div>
+    <p class="section-label">Photos</p>
+    <div class="photo-grid">${photos}</div>
+    <p class="section-label">Instructions</p>
+    <div class="inst-box${o.instructions?'':' empty'}">${o.instructions?esc(o.instructions):'No instructions added.'}</div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:14px;">
+      <div><p style="font-size:11px;color:var(--text3);">Received</p><p style="font-size:13px;font-weight:500;">${fmtDisp(o.start)}</p></div>
+      <div style="text-align:right;"><p style="font-size:11px;color:var(--text3);">Deadline</p><p style="font-size:13px;font-weight:500;">${fmtDisp(o.deadline)}</p></div>
+    </div>
+    <p class="section-label">Firing schedule</p>
+    <div style="margin-bottom:12px;">${firingList}</div>
+    <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:12px;">${chips}</div>
+    <button class="add-btn" style="margin-top:0;" onclick="closeModal();openAddFiringModal('',${JSON.stringify(id)})">+ Add firing day</button>
+    <button class="submit-btn" onclick="toggleComplete(${JSON.stringify(id)})">${o.completed?'Mark as active':'Mark as completed'}</button>
+    <button class="danger-btn" onclick="doDelete(${JSON.stringify(id)})">Delete order</button>`);
+};
+
+window.toggleComplete = async function(id){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  await updateOrder(id,{completed:!o.completed});
+  closeModal();
+  toast(o.completed?'Marked as active':'Marked as completed');
+};
+
+window.doDelete = async function(id){
+  if(!confirm('Delete this order? Cannot be undone.'))return;
+  await removeOrder(id);
+  closeModal();
+  toast('Order deleted');
+};
+
+// ── Edit modal ──
+window.openEditModal = function(id){
+  const o=orders.find(x=>x.id===id);if(!o)return;
+  editingOrderId=id;
+  pendingPhotos=[...(o.photos||[])];
+  selectedType=o.type;
+  showModal(`<h3>Edit order</h3>
+    <div class="form-group"><label class="form-label">Pendant name</label><input class="form-input" id="e-name" value="${esc(o.name)}" /></div>
+    <div class="form-group"><label class="form-label">Customer name</label><input class="form-input" id="e-customer" value="${esc(o.customer)}" /></div>
+    <div class="form-group"><label class="form-label">Finish type</label>
+      <div class="radio-group">
+        <div class="radio-opt${o.type==='gold'?' sel-gold':''}" id="eopt-gold" onclick="selType('gold','eopt-gold','eopt-plat')">Gold / classic</div>
+        <div class="radio-opt${o.type==='platinum'?' sel-plat':''}" id="eopt-plat" onclick="selType('platinum','eopt-gold','eopt-plat')">Platinum</div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Received date</label><input class="form-input" type="date" id="e-start" value="${o.start}" /></div>
+    <div class="form-group"><label class="form-label">Deadline</label><input class="form-input" type="date" id="e-deadline" value="${o.deadline}" /></div>
+    <div class="form-group"><label class="form-label">Instructions</label><textarea class="form-input" id="e-instructions">${esc(o.instructions||'')}</textarea></div>
+    <div class="form-group"><label class="form-label">Photos</label><div class="photo-grid" id="edit-photo-grid"></div></div>
+    <button class="submit-btn" id="e-submit-btn" onclick="saveEdit()">Save changes</button>
+    <button class="danger-btn" onclick="doDelete(${JSON.stringify(id)})">Delete order</button>`);
+  renderPendingPhotos('edit-photo-grid','edit-file-input',true);
+};
+
+window.saveEdit = async function(){
+  const id=editingOrderId;
+  const name=document.getElementById('e-name').value.trim();
+  const customer=document.getElementById('e-customer').value.trim();
+  const start=document.getElementById('e-start').value;
+  const deadline=document.getElementById('e-deadline').value;
+  const instructions=document.getElementById('e-instructions').value.trim();
+  if(!name||!selectedType||!start||!deadline){alert('Please fill all required fields.');return;}
+  const btn=document.getElementById('e-submit-btn');
+  btn.textContent='Saving…';btn.disabled=true;
+  try{
+    const uploadedPhotos=await uploadPendingFiles();
+    await updateOrder(id,{name,customer,type:selectedType,start,deadline,instructions,photos:uploadedPhotos});
+    closeModal();toast('Order updated!');
+  }catch(e){btn.textContent='Save changes';btn.disabled=false;alert('Error saving: '+e.message);}
+};
+
+// ── Add order modal ──
+window.openAddOrderModal = function(dateStr=''){
+  selectedType=null;pendingPhotos=[];editingOrderId=null;
+  showModal(`<h3>New order</h3>
+    <div class="etsy-bar">
+      <input class="form-input" id="etsy-url" placeholder="Paste Etsy listing URL to auto-fill…" />
+      <button class="etsy-btn" id="etsy-btn" onclick="importEtsy()">Import</button>
+    </div>
+    <div class="etsy-status" id="etsy-status"></div>
+    <div class="divider"></div>
+    <div class="form-group"><label class="form-label">Pendant name</label><input class="form-input" id="f-name" placeholder="e.g. Luna the Cat" /></div>
+    <div class="form-group"><label class="form-label">Customer name</label><input class="form-input" id="f-customer" placeholder="e.g. Maria P." /></div>
+    <div class="form-group"><label class="form-label">Finish type</label>
+      <div class="radio-group">
+        <div class="radio-opt" id="opt-gold" onclick="selType('gold','opt-gold','opt-plat')">Gold / classic</div>
+        <div class="radio-opt" id="opt-plat" onclick="selType('platinum','opt-gold','opt-plat')">Platinum</div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Received date</label><input class="form-input" type="date" id="f-start" value="${dateStr||today()}" /></div>
+    <div class="form-group"><label class="form-label">Deadline</label><input class="form-input" type="date" id="f-deadline" value="${dateStr?fmtDate(addDays(parseD(dateStr),14)):fmtDate(addDays(new Date(),14))}" /></div>
+    <div class="form-group"><label class="form-label">Instructions (optional)</label><textarea class="form-input" id="f-instructions" placeholder="Fur color, eye color, special details…"></textarea></div>
+    <div class="form-group"><label class="form-label">Photos</label><div class="photo-grid" id="add-photo-grid"></div></div>
+    <button class="submit-btn" id="f-submit-btn" onclick="submitOrder()">Add to calendar</button>`);
+  renderPendingPhotos('add-photo-grid','add-file-input',false);
+};
+
+window.submitOrder = async function(){
+  const name=document.getElementById('f-name').value.trim();
+  const customer=document.getElementById('f-customer').value.trim();
+  const start=document.getElementById('f-start').value;
+  const deadline=document.getElementById('f-deadline').value;
+  const instructions=document.getElementById('f-instructions').value.trim();
+  if(!name||!selectedType||!start||!deadline){alert('Please fill name, finish type, and dates.');return;}
+  const btn=document.getElementById('f-submit-btn');
+  btn.textContent='Saving…';btn.disabled=true;
+  try{
+    const photos=await uploadPendingFiles();
+    await saveOrder({name,customer,type:selectedType,start,deadline,instructions,photos,firings:{},completed:false});
+    closeModal();toast('Order added!');
+  }catch(e){btn.textContent='Add to calendar';btn.disabled=false;alert('Error: '+e.message);}
+};
+
+// ── Add firing modal ──
+window.openAddFiringModal = function(preDate='', preOrderId=null){
+  selectedFire=null;
+  const boxes=orders.filter(o=>!o.completed).map(o=>`<label class="order-check">
+    <input type="checkbox" value="${o.id}" ${preOrderId===o.id?'checked':''} style="width:15px;height:15px;cursor:pointer;flex-shrink:0;">
+    <span style="flex:1;">${esc(o.name)}</span>
+    <span style="font-size:11px;color:var(--text3);">${esc(o.customer)}</span>
+    <span style="width:10px;height:10px;border-radius:2px;border:2px solid ${o.type==='gold'?'var(--gold-border)':'var(--plat-border)'};background:${o.type==='gold'?'var(--gold-bg)':'var(--plat-bg)'};flex-shrink:0;"></span>
+  </label>`).join('');
+  showModal(`<h3>Add firing day</h3>
+    <div class="form-group"><label class="form-label">Firing date</label><input class="form-input" type="date" id="ff-date" value="${preDate||today()}" /></div>
+    <div class="form-group"><label class="form-label">Firing type</label>
+      <div class="fire-grid">
+        <div class="fire-opt" id="fo-bisque" onclick="selFire('bisque')">Bisque</div>
+        <div class="fire-opt" id="fo-glaze" onclick="selFire('glaze')">Glaze</div>
+        <div class="fire-opt" id="fo-gold-fire" onclick="selFire('gold-fire')">Gold / Platinum</div>
+        <div class="fire-opt" id="fo-correction" onclick="selFire('correction')">Correction</div>
+      </div>
+    </div>
+    <div class="form-group"><label class="form-label">Pendants in this kiln</label>
+      ${boxes||'<div style="color:var(--text3);font-size:13px;padding:8px 0;">No active orders.</div>'}
+    </div>
+    <button class="submit-btn" id="ff-submit-btn" onclick="submitFiring()">Save firing day</button>`);
+};
+
+window.submitFiring = async function(){
+  const date=document.getElementById('ff-date').value;
+  if(!date||!selectedFire){alert('Please select a date and firing type.');return;}
+  const checked=[...document.querySelectorAll('#modal-root input[type=checkbox]:checked')].map(i=>i.value);
+  if(!checked.length){alert('Select at least one pendant.');return;}
+  const btn=document.getElementById('ff-submit-btn');btn.textContent='Saving…';btn.disabled=true;
+  try{
+    await Promise.all(checked.map(id=>{
+      const o=orders.find(x=>x.id===id);if(!o)return;
+      const f={...(o.firings||{}),[date]:selectedFire};
+      return updateOrder(id,{firings:f});
+    }));
+    closeModal();toast('Firing day saved!');
+  }catch(e){btn.textContent='Save firing day';btn.disabled=false;alert('Error: '+e.message);}
+};
+
+// ── Etsy import ──
+window.importEtsy = async function(){
+  const url=document.getElementById('etsy-url').value.trim();
+  if(!url){setEtsyStatus('Please paste an Etsy URL.','error');return;}
+  const btn=document.getElementById('etsy-btn');btn.disabled=true;btn.textContent='…';
+  setEtsyStatus('Fetching listing…','');
+  try{
+    const resp=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(url));
+    const data=await resp.json();
+    const html=data.contents||'';
+    const titleMatch=html.match(/<title[^>]*>([^<]+)<\/title>/i);
+    const raw=titleMatch?titleMatch[1].replace(/\s*[\|\-].*$/,'').replace(/\s+on Etsy.*/i,'').trim():'';
+    const ogImg=html.match(/<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']/i);
+    const desc=html.match(/<meta[^>]+name=["']description["'][^>]+content=["']([^"']+)["']/i);
+    if(raw){
+      document.getElementById('f-name').value=raw;
+      if(desc) document.getElementById('f-instructions').value=desc[1].trim().slice(0,300);
+      if(ogImg){pendingPhotos=[ogImg[1]];renderPendingPhotos('add-photo-grid','add-file-input',false);}
+      setEtsyStatus('Imported! Please review and adjust.','success');
+    } else {setEtsyStatus('Could not parse listing. Please fill manually.','error');}
+  }catch(e){setEtsyStatus('Could not reach Etsy. Fill manually.','error');}
+  btn.disabled=false;btn.textContent='Import';
+};
+
+function setEtsyStatus(msg,type){
+  const el=document.getElementById('etsy-status');if(!el)return;
+  el.textContent=msg;el.style.color=type==='error'?'#b71c1c':type==='success'?'#2e7d32':'var(--text2)';
+}
+
+// ── Photo helpers ──
+function renderPendingPhotos(gridId,inputId,isEdit){
+  const grid=document.getElementById(gridId);if(!grid)return;
+  let html=pendingPhotos.map((p,i)=>`<div class="photo-item">
+    <img src="${p}" onerror="this.parentNode.innerHTML='🐾'" />
+    <button class="del-photo" onclick="removePendingPhoto(${i},'${gridId}','${inputId}',${isEdit})">×</button>
+  </div>`).join('');
+  html+=`<div class="upload-zone" onclick="document.getElementById('${inputId}').click()"><div style="font-size:20px;">+</div><div style="font-size:11px;">Upload</div></div>`;
+  html+=`<input type="file" id="${inputId}" accept="image/*" multiple style="display:none;" onchange="handleFileInput(this,'${gridId}','${inputId}',${isEdit})" />`;
+  grid.innerHTML=html;
+}
+
+window.removePendingPhoto = function(i,gridId,inputId,isEdit){pendingPhotos.splice(i,1);renderPendingPhotos(gridId,inputId,isEdit);};
+
+window.handleFileInput = function(inp,gridId,inputId,isEdit){
+  [...inp.files].forEach(f=>{
+    const r=new FileReader();
+    r.onload=e=>{pendingPhotos.push({file:f,preview:e.target.result});renderPendingPhotos(gridId,inputId,isEdit);};
+    r.readAsDataURL(f);
+  });
+};
+
+async function uploadPendingFiles(){
+  const urls=[];
+  for(const p of pendingPhotos){
+    if(typeof p==='string'){urls.push(p);}
+    else if(p.file){
+      try{const url=await uploadPhoto(p.file);urls.push(url);}
+      catch(e){console.error('Upload failed',e);}
+    }
+  }
+  return urls;
+}
+
+// ── Shared selectors ──
+window.selType = function(t,idA,idB){
+  selectedType=t;
+  const a=document.getElementById(idA),b=document.getElementById(idB);
+  if(a)a.className='radio-opt'+(t==='gold'?' sel-gold':'');
+  if(b)b.className='radio-opt'+(t==='platinum'?' sel-plat':'');
+};
+
+window.selFire = function(t){
+  selectedFire=t;
+  ['bisque','glaze','gold-fire','correction'].forEach(f=>{
+    const el=document.getElementById('fo-'+f);
+    if(el)el.className='fire-opt'+(f===t?' sel-'+f:'');
+  });
+};
+
+// ── Utilities ──
+window.openFullImg = function(src){
+  const ov=document.createElement('div');
+  ov.className='fullimg-ov';
+  ov.innerHTML=`<img src="${src}" />`;
+  ov.onclick=()=>ov.remove();
+  document.body.appendChild(ov);
+};
+
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function showModal(content){
+  document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" id="moverlay" onclick="overlayClose(event)"><div class="modal"><div class="modal-handle"></div><button class="modal-close" onclick="closeModal()">×</button>${content}</div></div>`;
+}
+window.overlayClose = function(e){if(e.target.id==='moverlay')closeModal();};
+window.closeModal = function(){document.getElementById('modal-root').innerHTML='';};
+
+</script>
+</body>
+</html>
