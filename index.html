@@ -25,12 +25,28 @@
   }
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;}
-#app{max-width:540px;margin:0 auto;padding:16px 12px 80px;}
+
+/* ── Login screen ── */
+#login-screen{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:100vh;padding:32px 24px;}
+#login-screen h1{font-size:28px;font-weight:700;margin-bottom:6px;letter-spacing:-.5px;}
+#login-screen p{font-size:14px;color:var(--text2);margin-bottom:32px;}
+.login-box{width:100%;max-width:340px;background:var(--bg);border:0.5px solid var(--border);border-radius:16px;padding:24px;}
+.login-box label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bottom:6px;}
+.login-box input{width:100%;padding:11px 13px;border-radius:var(--radius);border:0.5px solid var(--border2);background:var(--bg);color:var(--text);font-size:16px;font-family:inherit;outline:none;margin-bottom:14px;}
+.login-box input:focus{border-color:var(--text2);}
+.login-btn{width:100%;padding:12px;background:var(--text);color:var(--bg);border:none;border-radius:var(--radius);font-size:15px;font-family:inherit;cursor:pointer;font-weight:500;}
+.login-btn:hover{opacity:.88;}
+.login-error{font-size:13px;color:#b71c1c;margin-top:10px;text-align:center;min-height:18px;}
+
+/* ── App ── */
+#app{display:none;max-width:480px;margin:0 auto;padding:16px 12px 80px;}
 .top-bar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .top-bar h1{font-size:18px;font-weight:600;letter-spacing:-.3px;}
+.top-bar-right{display:flex;align-items:center;gap:8px;}
 .view-tabs{display:flex;gap:4px;background:var(--bg2);padding:3px;border-radius:20px;}
 .vtab{font-size:12px;padding:5px 14px;border-radius:16px;border:none;background:none;color:var(--text2);cursor:pointer;transition:all .15s;font-weight:500;}
 .vtab.active{background:var(--bg);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.12);}
+.logout-btn{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;padding:4px 0;font-family:inherit;}
 .legend{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:10px 12px;background:var(--bg2);border-radius:var(--radius);border:0.5px solid var(--border);}
 .legend-item{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
 .legend-dot{width:10px;height:10px;border-radius:2px;border:2px solid;flex-shrink:0;}
@@ -39,24 +55,26 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ftag.glaze{background:#e8f5e9;color:#2e7d32;border:0.5px solid #4caf50;}
 .ftag.gold-fire{background:#fffbea;color:#8a6800;border:0.5px solid #e6b800;}
 .ftag.correction{background:#fce4ec;color:#b71c1c;border:0.5px solid #ef9a9a;}
-.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .nav-btn{background:var(--bg2);border:0.5px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
-.months-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
-.month-block h2{font-size:10px;font-weight:600;color:var(--text3);margin-bottom:6px;text-align:center;letter-spacing:.08em;text-transform:uppercase;}
-.weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:3px;}
-.weekdays span{font-size:9px;color:var(--text3);text-align:center;}
-.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;}
-.day-cell{min-height:36px;border-radius:5px;padding:2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:background .1s;}
+
+/* ── Stacked months ── */
+.months-wrap{display:flex;flex-direction:column;gap:24px;}
+.month-block{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px;}
+.month-block h2{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;text-align:center;letter-spacing:.02em;}
+.weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
+.weekdays span{font-size:10px;color:var(--text3);text-align:center;padding:2px 0;}
+.days-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;}
+.day-cell{min-height:46px;border-radius:6px;padding:3px 2px;cursor:pointer;display:flex;flex-direction:column;align-items:center;transition:background .1s;position:relative;}
 .day-cell:hover{background:var(--bg2);}
-.day-cell.empty{cursor:default;pointer-events:none;}
 .day-cell.today .day-num{background:var(--text);color:var(--bg);border-radius:50%;}
-.day-num{font-size:10px;color:var(--text2);width:18px;height:18px;display:flex;align-items:center;justify-content:center;}
-.dots-row{display:flex;gap:1px;flex-wrap:wrap;justify-content:center;margin-top:1px;}
-.dot{width:7px;height:7px;border-radius:2px;border:2px solid transparent;flex-shrink:0;}
+.day-num{font-size:11px;color:var(--text2);width:22px;height:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.dots-row{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:2px;}
+.dot{width:8px;height:8px;border-radius:2px;border:2px solid transparent;flex-shrink:0;}
 .dot.gold{border-color:var(--gold-border);background:var(--gold-bg);}
 .dot.platinum{border-color:var(--plat-border);background:var(--plat-bg);}
 .dot.start{opacity:.5;}
-.day-ftag{font-size:7px;padding:1px 2px;border-radius:2px;margin-top:1px;font-weight:600;white-space:nowrap;}
+.day-ftag{font-size:7px;padding:1px 2px;border-radius:2px;margin-top:2px;font-weight:600;white-space:nowrap;}
 .day-ftag.bisque{background:#fff3e0;color:#b26200;}
 .day-ftag.glaze{background:#e8f5e9;color:#2e7d32;}
 .day-ftag.gold-fire{background:#fffbea;color:#8a6800;}
@@ -82,7 +100,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .chip.chip-active{background:#e3f2fd;color:#1565c0;border-color:#90caf9;}
 .chip.overdue{background:#fce4ec;color:#b71c1c;border-color:#ef9a9a;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center;z-index:100;}
-.modal{background:var(--bg);border-radius:20px 20px 0 0;width:100%;max-width:540px;padding:20px 16px;max-height:92vh;overflow-y:auto;}
+.modal{background:var(--bg);border-radius:20px 20px 0 0;width:100%;max-width:480px;padding:20px 16px;max-height:92vh;overflow-y:auto;}
 .modal-handle{width:36px;height:4px;background:var(--border2);border-radius:2px;margin:0 auto 16px;}
 .modal-close{float:right;background:none;border:none;font-size:22px;cursor:pointer;color:var(--text2);margin-top:-4px;line-height:1;}
 .modal h3{font-size:16px;font-weight:600;margin-bottom:14px;}
@@ -140,15 +158,39 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;}
 .toast.show{opacity:1;}
 .loading{text-align:center;padding:3rem;color:var(--text3);font-size:14px;}
 .firing-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:0.5px solid var(--border);}
+/* day action sheet */
+.action-sheet{display:flex;flex-direction:column;gap:8px;margin-top:4px;}
+.action-card{display:flex;align-items:center;gap:12px;padding:14px;border-radius:var(--radius);border:0.5px solid var(--border);background:var(--bg2);cursor:pointer;transition:background .1s;}
+.action-card:hover{background:var(--border);}
+.action-icon{font-size:22px;width:36px;text-align:center;flex-shrink:0;}
+.action-label{font-size:14px;font-weight:500;}
+.action-sub{font-size:12px;color:var(--text2);margin-top:1px;}
 </style>
 </head>
 <body>
+
+<!-- Login -->
+<div id="login-screen">
+  <h1>🔥 Kiln Calendar</h1>
+  <p>Enter your team password to continue</p>
+  <div class="login-box">
+    <label>Password</label>
+    <input type="password" id="pw-input" placeholder="••••••" onkeydown="if(event.key==='Enter')doLogin()" />
+    <button class="login-btn" onclick="doLogin()">Sign in</button>
+    <div class="login-error" id="pw-error"></div>
+  </div>
+</div>
+
+<!-- App -->
 <div id="app">
   <div class="top-bar">
     <h1>🔥 Kiln Calendar</h1>
-    <div class="view-tabs">
-      <button class="vtab active" onclick="switchView('calendar')" id="tab-calendar">Calendar</button>
-      <button class="vtab" onclick="switchView('history')" id="tab-history">History</button>
+    <div class="top-bar-right">
+      <div class="view-tabs">
+        <button class="vtab active" onclick="switchView('calendar')" id="tab-calendar">Calendar</button>
+        <button class="vtab" onclick="switchView('history')" id="tab-history">History</button>
+      </div>
+      <button class="logout-btn" onclick="doLogout()">Lock</button>
     </div>
   </div>
 
@@ -185,12 +227,13 @@ textarea.form-input{resize:vertical;min-height:72px;line-height:1.5;}
     <div class="history-wrap" id="history-wrap"><div class="loading">Loading…</div></div>
   </div>
 </div>
+
 <div id="modal-root"></div>
 <div class="toast" id="toast"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { getFirestore, collection, addDoc, doc, updateDoc, deleteDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
@@ -202,6 +245,9 @@ const firebaseConfig = {
   appId: "1:928635678896:web:ec178ccfd39eae9b648b75"
 };
 
+const TEAM_PASSWORD = "gruni";
+const SESSION_KEY = "kiln_auth";
+
 const fbApp = initializeApp(firebaseConfig);
 const db = getFirestore(fbApp);
 const storage = getStorage(fbApp);
@@ -210,8 +256,50 @@ const MONTHS=['January','February','March','April','May','June','July','August',
 const WDAYS=['Mo','Tu','We','Th','Fr','Sa','Su'];
 let baseMonth=new Date().getMonth(), baseYear=new Date().getFullYear();
 let histFilter='all', selectedType=null, selectedFire=null, pendingPhotos=[];
-let orders=[];
-let editingOrderId=null;
+let orders=[], editingOrderId=null;
+
+// ── Auth ──
+function checkSession(){
+  return sessionStorage.getItem(SESSION_KEY)==='1';
+}
+
+window.doLogin = function(){
+  const val=document.getElementById('pw-input').value;
+  if(val===TEAM_PASSWORD){
+    sessionStorage.setItem(SESSION_KEY,'1');
+    document.getElementById('login-screen').style.display='none';
+    document.getElementById('app').style.display='block';
+    startApp();
+  } else {
+    document.getElementById('pw-error').textContent='Wrong password. Try again.';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+};
+
+window.doLogout = function(){
+  sessionStorage.removeItem(SESSION_KEY);
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('pw-input').value='';
+  document.getElementById('pw-error').textContent='';
+};
+
+// auto-login if session active
+if(checkSession()){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='block';
+  startApp();
+}
+
+function startApp(){
+  const q=query(collection(db,'orders'),orderBy('start','desc'));
+  onSnapshot(q,snap=>{
+    orders=snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderCalendar();
+    if(document.getElementById('view-history').style.display!=='none') renderHistory();
+  });
+}
 
 function fmtDate(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function addDays(d,n){let x=new Date(d);x.setDate(x.getDate()+n);return x;}
@@ -219,35 +307,21 @@ function today(){return fmtDate(new Date());}
 function parseD(s){return new Date(s+'T12:00:00');}
 function fmtDisp(s){const d=parseD(s);return d.getDate()+' '+MONTHS[d.getMonth()].slice(0,3)+' '+d.getFullYear();}
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-// ── Firestore real-time listener ──
-const q = query(collection(db,'orders'), orderBy('start','desc'));
-onSnapshot(q, snap => {
-  orders = snap.docs.map(d=>({id:d.id,...d.data()}));
-  renderCalendar();
-  if(document.getElementById('view-history').style.display!=='none') renderHistory();
-});
-
-async function saveOrder(data){
-  await addDoc(collection(db,'orders'), data);
-}
-async function updateOrder(id, data){
-  await updateDoc(doc(db,'orders',id), data);
-}
-async function removeOrder(id){
-  await deleteDoc(doc(db,'orders',id));
-}
-
+async function saveOrder(data){await addDoc(collection(db,'orders'),data);}
+async function updateOrder(id,data){await updateDoc(doc(db,'orders',id),data);}
+async function removeOrder(id){await deleteDoc(doc(db,'orders',id));}
 async function uploadPhoto(file){
   const ext=file.name.split('.').pop();
   const path=`photos/${Date.now()}_${Math.random().toString(36).slice(2)}.${ext}`;
-  const storageRef=ref(storage,path);
-  await uploadBytes(storageRef,file);
-  return await getDownloadURL(storageRef);
+  const sRef=ref(storage,path);
+  await uploadBytes(sRef,file);
+  return await getDownloadURL(sRef);
 }
 
 // ── Views ──
-window.switchView = function(v){
+window.switchView=function(v){
   document.getElementById('view-calendar').style.display=v==='calendar'?'':'none';
   document.getElementById('view-history').style.display=v==='history'?'':'none';
   document.getElementById('tab-calendar').classList.toggle('active',v==='calendar');
@@ -255,7 +329,7 @@ window.switchView = function(v){
   if(v==='history') renderHistory();
 };
 
-window.setFilter = function(f){
+window.setFilter=function(f){
   histFilter=f;
   ['all','active','done','gold','plat'].forEach(x=>{const el=document.getElementById('hf-'+x);if(el)el.classList.remove('active');});
   document.getElementById('hf-'+f).classList.add('active');
@@ -287,7 +361,7 @@ function renderHistory(){
 }
 
 // ── Calendar ──
-window.shiftMonths = function(d){
+window.shiftMonths=function(d){
   baseMonth+=d;
   if(baseMonth>11){baseMonth=0;baseYear++;}
   if(baseMonth<0){baseMonth=11;baseYear--;}
@@ -304,11 +378,11 @@ function renderMonth(year,month){
   const dim=new Date(year,month+1,0).getDate();
   let fdow=new Date(year,month,1).getDay();fdow=fdow===0?6:fdow-1;
   let cells='';
-  for(let i=0;i<fdow;i++) cells+='<div class="day-cell empty"></div>';
+  for(let i=0;i<fdow;i++) cells+='<div class="day-cell" style="cursor:default;pointer-events:none;"></div>';
   for(let d=1;d<=dim;d++){
     const ds=year+'-'+String(month+1).padStart(2,'0')+'-'+String(d).padStart(2,'0');
     const isToday=ds===today();
-    const oS=orders.filter(o=>o.start===ds), oD=orders.filter(o=>o.deadline===ds);
+    const oS=orders.filter(o=>o.start===ds),oD=orders.filter(o=>o.deadline===ds);
     const firings={};
     orders.forEach(o=>{if(o.firings&&o.firings[ds]){if(!firings[o.firings[ds]])firings[o.firings[ds]]=0;firings[o.firings[ds]]++;}});
     let dots='';
@@ -316,36 +390,43 @@ function renderMonth(year,month){
     oD.forEach(o=>{dots+=`<div class="dot ${o.type}"></div>`;});
     let ftags='';
     Object.keys(firings).forEach(t=>{const lb={bisque:'B',glaze:'G','gold-fire':'Au',correction:'C'};ftags+=`<div class="day-ftag ${t}">${lb[t]}</div>`;});
-    const has=oS.length||oD.length||Object.keys(firings).length;
-    cells+=`<div class="day-cell${isToday?' today':''}${!has?' empty':''}" ${has?`onclick="openDayModal('${ds}')"`:''}><span class="day-num">${d}</span><div class="dots-row">${dots}</div>${ftags}</div>`;
+    // every day is tappable now
+    cells+=`<div class="day-cell${isToday?' today':''}" onclick="openDayModal('${ds}')"><span class="day-num">${d}</span><div class="dots-row">${dots}</div>${ftags}</div>`;
   }
-  return `<div class="month-block"><h2>${MONTHS[month]} ${year}</h2><div class="weekdays">${WDAYS.map(w=>`<span>${w}</span>`).join('')}</div><div class="days-grid">${cells}</div></div>`;
+  return `<div class="month-block"><h2>${MONTHS[month].toUpperCase()} ${year}</h2><div class="weekdays">${WDAYS.map(w=>`<span>${w}</span>`).join('')}</div><div class="days-grid">${cells}</div></div>`;
 }
 
-// ── Day modal ──
-window.openDayModal = function(ds){
+// ── Day modal — always shows action options + existing events ──
+window.openDayModal=function(ds){
   const d=parseD(ds);
   const label=d.getDate()+' '+MONTHS[d.getMonth()]+' '+d.getFullYear();
-  const oS=orders.filter(o=>o.start===ds), oD=orders.filter(o=>o.deadline===ds);
+  const oS=orders.filter(o=>o.start===ds),oD=orders.filter(o=>o.deadline===ds);
   const fOrders=orders.filter(o=>o.firings&&o.firings[ds]);
-  let html='';
+  let eventsHtml='';
   if(fOrders.length){
     const ft=fOrders[0].firings[ds];
     const fn={bisque:'Bisque firing',glaze:'Glaze firing','gold-fire':'Gold/Platinum firing',correction:'Correction firing'};
-    html+=`<p class="section-label">${fn[ft]||ft} — ${fOrders.length} pendant${fOrders.length>1?'s':''}</p>`;
-    fOrders.forEach(o=>{html+=miniCard(o,o.firings[ds]);});
+    eventsHtml+=`<p class="section-label">${fn[ft]||ft} — ${fOrders.length} pendant${fOrders.length>1?'s':''}</p>`;
+    fOrders.forEach(o=>{eventsHtml+=miniCard(o,o.firings[ds]);});
   }
   if(oS.length||oD.length){
-    if(fOrders.length) html+=`<div class="divider"></div>`;
+    if(fOrders.length) eventsHtml+=`<div class="divider"></div>`;
     const shown=new Set();
-    [...oS,...oD].forEach(o=>{if(!shown.has(o.id)){shown.add(o.id);html+=miniCard(o,o.start===ds?'Received':'Deadline');}});
+    [...oS,...oD].forEach(o=>{if(!shown.has(o.id)){shown.add(o.id);eventsHtml+=miniCard(o,o.start===ds?'Received':'Deadline');}});
   }
-  if(!html) html='<div class="loading">Nothing scheduled.</div>';
-  showModal(`<h3>${label}</h3>${html}
-    <div style="display:flex;gap:8px;margin-top:12px;">
-      <button class="add-btn" style="margin-top:0;" onclick="closeModal();openAddOrderModal('${ds}')">+ Order</button>
-      <button class="add-btn" style="margin-top:0;" onclick="closeModal();openAddFiringModal('${ds}')">+ Firing</button>
-    </div>`);
+  const actionsHtml=`
+    <p class="section-label">Add to this day</p>
+    <div class="action-sheet">
+      <div class="action-card" onclick="closeModal();openAddOrderModal('${ds}')">
+        <div class="action-icon">📦</div>
+        <div><div class="action-label">New order</div><div class="action-sub">Add a pendant order received today</div></div>
+      </div>
+      <div class="action-card" onclick="closeModal();openAddFiringModal('${ds}')">
+        <div class="action-icon">🔥</div>
+        <div><div class="action-label">Firing day</div><div class="action-sub">Schedule a kiln firing on this day</div></div>
+      </div>
+    </div>`;
+  showModal(`<h3>${label}</h3>${eventsHtml}${actionsHtml}`);
 };
 
 function miniCard(o,badge){
@@ -367,7 +448,7 @@ function miniCard(o,badge){
 }
 
 // ── Order detail ──
-window.openOrderDetail = function(id){
+window.openOrderDetail=function(id){
   const o=orders.find(x=>x.id===id);if(!o)return;
   const photos=(o.photos&&o.photos.length)
     ?o.photos.map(p=>`<div class="photo-item" onclick="openFullImg('${p}')"><img src="${p}" onerror="this.parentNode.innerHTML='🐾'" /></div>`).join('')
@@ -405,26 +486,21 @@ window.openOrderDetail = function(id){
     <button class="danger-btn" onclick="doDelete(${JSON.stringify(id)})">Delete order</button>`);
 };
 
-window.toggleComplete = async function(id){
+window.toggleComplete=async function(id){
   const o=orders.find(x=>x.id===id);if(!o)return;
   await updateOrder(id,{completed:!o.completed});
-  closeModal();
-  toast(o.completed?'Marked as active':'Marked as completed');
+  closeModal();toast(o.completed?'Marked as active':'Marked as completed');
 };
 
-window.doDelete = async function(id){
+window.doDelete=async function(id){
   if(!confirm('Delete this order? Cannot be undone.'))return;
-  await removeOrder(id);
-  closeModal();
-  toast('Order deleted');
+  await removeOrder(id);closeModal();toast('Order deleted');
 };
 
 // ── Edit modal ──
-window.openEditModal = function(id){
+window.openEditModal=function(id){
   const o=orders.find(x=>x.id===id);if(!o)return;
-  editingOrderId=id;
-  pendingPhotos=[...(o.photos||[])];
-  selectedType=o.type;
+  editingOrderId=id;pendingPhotos=[...(o.photos||[])];selectedType=o.type;
   showModal(`<h3>Edit order</h3>
     <div class="form-group"><label class="form-label">Pendant name</label><input class="form-input" id="e-name" value="${esc(o.name)}" /></div>
     <div class="form-group"><label class="form-label">Customer name</label><input class="form-input" id="e-customer" value="${esc(o.customer)}" /></div>
@@ -443,7 +519,7 @@ window.openEditModal = function(id){
   renderPendingPhotos('edit-photo-grid','edit-file-input',true);
 };
 
-window.saveEdit = async function(){
+window.saveEdit=async function(){
   const id=editingOrderId;
   const name=document.getElementById('e-name').value.trim();
   const customer=document.getElementById('e-customer').value.trim();
@@ -451,17 +527,16 @@ window.saveEdit = async function(){
   const deadline=document.getElementById('e-deadline').value;
   const instructions=document.getElementById('e-instructions').value.trim();
   if(!name||!selectedType||!start||!deadline){alert('Please fill all required fields.');return;}
-  const btn=document.getElementById('e-submit-btn');
-  btn.textContent='Saving…';btn.disabled=true;
+  const btn=document.getElementById('e-submit-btn');btn.textContent='Saving…';btn.disabled=true;
   try{
-    const uploadedPhotos=await uploadPendingFiles();
-    await updateOrder(id,{name,customer,type:selectedType,start,deadline,instructions,photos:uploadedPhotos});
+    const photos=await uploadPendingFiles();
+    await updateOrder(id,{name,customer,type:selectedType,start,deadline,instructions,photos});
     closeModal();toast('Order updated!');
-  }catch(e){btn.textContent='Save changes';btn.disabled=false;alert('Error saving: '+e.message);}
+  }catch(e){btn.textContent='Save changes';btn.disabled=false;alert('Error: '+e.message);}
 };
 
 // ── Add order modal ──
-window.openAddOrderModal = function(dateStr=''){
+window.openAddOrderModal=function(dateStr=''){
   selectedType=null;pendingPhotos=[];editingOrderId=null;
   showModal(`<h3>New order</h3>
     <div class="etsy-bar">
@@ -486,15 +561,14 @@ window.openAddOrderModal = function(dateStr=''){
   renderPendingPhotos('add-photo-grid','add-file-input',false);
 };
 
-window.submitOrder = async function(){
+window.submitOrder=async function(){
   const name=document.getElementById('f-name').value.trim();
   const customer=document.getElementById('f-customer').value.trim();
   const start=document.getElementById('f-start').value;
   const deadline=document.getElementById('f-deadline').value;
   const instructions=document.getElementById('f-instructions').value.trim();
   if(!name||!selectedType||!start||!deadline){alert('Please fill name, finish type, and dates.');return;}
-  const btn=document.getElementById('f-submit-btn');
-  btn.textContent='Saving…';btn.disabled=true;
+  const btn=document.getElementById('f-submit-btn');btn.textContent='Saving…';btn.disabled=true;
   try{
     const photos=await uploadPendingFiles();
     await saveOrder({name,customer,type:selectedType,start,deadline,instructions,photos,firings:{},completed:false});
@@ -503,13 +577,13 @@ window.submitOrder = async function(){
 };
 
 // ── Add firing modal ──
-window.openAddFiringModal = function(preDate='', preOrderId=null){
+window.openAddFiringModal=function(preDate='',preOrderId=null){
   selectedFire=null;
   const boxes=orders.filter(o=>!o.completed).map(o=>`<label class="order-check">
     <input type="checkbox" value="${o.id}" ${preOrderId===o.id?'checked':''} style="width:15px;height:15px;cursor:pointer;flex-shrink:0;">
     <span style="flex:1;">${esc(o.name)}</span>
     <span style="font-size:11px;color:var(--text3);">${esc(o.customer)}</span>
-    <span style="width:10px;height:10px;border-radius:2px;border:2px solid ${o.type==='gold'?'var(--gold-border)':'var(--plat-border)'};background:${o.type==='gold'?'var(--gold-bg)':'var(--plat-bg)'};flex-shrink:0;"></span>
+    <span style="width:10px;height:10px;border-radius:2px;border:2px solid ${''};flex-shrink:0;" class="dot ${o.type==='gold'?'gold':'platinum'}"></span>
   </label>`).join('');
   showModal(`<h3>Add firing day</h3>
     <div class="form-group"><label class="form-label">Firing date</label><input class="form-input" type="date" id="ff-date" value="${preDate||today()}" /></div>
@@ -527,7 +601,7 @@ window.openAddFiringModal = function(preDate='', preOrderId=null){
     <button class="submit-btn" id="ff-submit-btn" onclick="submitFiring()">Save firing day</button>`);
 };
 
-window.submitFiring = async function(){
+window.submitFiring=async function(){
   const date=document.getElementById('ff-date').value;
   if(!date||!selectedFire){alert('Please select a date and firing type.');return;}
   const checked=[...document.querySelectorAll('#modal-root input[type=checkbox]:checked')].map(i=>i.value);
@@ -536,15 +610,14 @@ window.submitFiring = async function(){
   try{
     await Promise.all(checked.map(id=>{
       const o=orders.find(x=>x.id===id);if(!o)return;
-      const f={...(o.firings||{}),[date]:selectedFire};
-      return updateOrder(id,{firings:f});
+      return updateOrder(id,{firings:{...(o.firings||{}),[date]:selectedFire}});
     }));
     closeModal();toast('Firing day saved!');
   }catch(e){btn.textContent='Save firing day';btn.disabled=false;alert('Error: '+e.message);}
 };
 
 // ── Etsy import ──
-window.importEtsy = async function(){
+window.importEtsy=async function(){
   const url=document.getElementById('etsy-url').value.trim();
   if(!url){setEtsyStatus('Please paste an Etsy URL.','error');return;}
   const btn=document.getElementById('etsy-btn');btn.disabled=true;btn.textContent='…';
@@ -562,7 +635,7 @@ window.importEtsy = async function(){
       if(desc) document.getElementById('f-instructions').value=desc[1].trim().slice(0,300);
       if(ogImg){pendingPhotos=[ogImg[1]];renderPendingPhotos('add-photo-grid','add-file-input',false);}
       setEtsyStatus('Imported! Please review and adjust.','success');
-    } else {setEtsyStatus('Could not parse listing. Please fill manually.','error');}
+    } else {setEtsyStatus('Could not parse listing. Fill manually.','error');}
   }catch(e){setEtsyStatus('Could not reach Etsy. Fill manually.','error');}
   btn.disabled=false;btn.textContent='Import';
 };
@@ -575,18 +648,17 @@ function setEtsyStatus(msg,type){
 // ── Photo helpers ──
 function renderPendingPhotos(gridId,inputId,isEdit){
   const grid=document.getElementById(gridId);if(!grid)return;
-  let html=pendingPhotos.map((p,i)=>`<div class="photo-item">
-    <img src="${p}" onerror="this.parentNode.innerHTML='🐾'" />
-    <button class="del-photo" onclick="removePendingPhoto(${i},'${gridId}','${inputId}',${isEdit})">×</button>
-  </div>`).join('');
+  let html=pendingPhotos.map((p,i)=>{
+    const src=typeof p==='string'?p:p.preview;
+    return `<div class="photo-item"><img src="${src}" onerror="this.parentNode.innerHTML='🐾'" /><button class="del-photo" onclick="removePendingPhoto(${i},'${gridId}','${inputId}',${isEdit})">×</button></div>`;
+  }).join('');
   html+=`<div class="upload-zone" onclick="document.getElementById('${inputId}').click()"><div style="font-size:20px;">+</div><div style="font-size:11px;">Upload</div></div>`;
   html+=`<input type="file" id="${inputId}" accept="image/*" multiple style="display:none;" onchange="handleFileInput(this,'${gridId}','${inputId}',${isEdit})" />`;
   grid.innerHTML=html;
 }
 
-window.removePendingPhoto = function(i,gridId,inputId,isEdit){pendingPhotos.splice(i,1);renderPendingPhotos(gridId,inputId,isEdit);};
-
-window.handleFileInput = function(inp,gridId,inputId,isEdit){
+window.removePendingPhoto=function(i,gridId,inputId,isEdit){pendingPhotos.splice(i,1);renderPendingPhotos(gridId,inputId,isEdit);};
+window.handleFileInput=function(inp,gridId,inputId,isEdit){
   [...inp.files].forEach(f=>{
     const r=new FileReader();
     r.onload=e=>{pendingPhotos.push({file:f,preview:e.target.result});renderPendingPhotos(gridId,inputId,isEdit);};
@@ -598,23 +670,19 @@ async function uploadPendingFiles(){
   const urls=[];
   for(const p of pendingPhotos){
     if(typeof p==='string'){urls.push(p);}
-    else if(p.file){
-      try{const url=await uploadPhoto(p.file);urls.push(url);}
-      catch(e){console.error('Upload failed',e);}
-    }
+    else if(p.file){try{urls.push(await uploadPhoto(p.file));}catch(e){console.error(e);}}
   }
   return urls;
 }
 
-// ── Shared selectors ──
-window.selType = function(t,idA,idB){
+window.selType=function(t,idA,idB){
   selectedType=t;
   const a=document.getElementById(idA),b=document.getElementById(idB);
   if(a)a.className='radio-opt'+(t==='gold'?' sel-gold':'');
   if(b)b.className='radio-opt'+(t==='platinum'?' sel-plat':'');
 };
 
-window.selFire = function(t){
+window.selFire=function(t){
   selectedFire=t;
   ['bisque','glaze','gold-fire','correction'].forEach(f=>{
     const el=document.getElementById('fo-'+f);
@@ -622,8 +690,7 @@ window.selFire = function(t){
   });
 };
 
-// ── Utilities ──
-window.openFullImg = function(src){
+window.openFullImg=function(src){
   const ov=document.createElement('div');
   ov.className='fullimg-ov';
   ov.innerHTML=`<img src="${src}" />`;
@@ -631,14 +698,11 @@ window.openFullImg = function(src){
   document.body.appendChild(ov);
 };
 
-function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
-
 function showModal(content){
   document.getElementById('modal-root').innerHTML=`<div class="modal-overlay" id="moverlay" onclick="overlayClose(event)"><div class="modal"><div class="modal-handle"></div><button class="modal-close" onclick="closeModal()">×</button>${content}</div></div>`;
 }
-window.overlayClose = function(e){if(e.target.id==='moverlay')closeModal();};
-window.closeModal = function(){document.getElementById('modal-root').innerHTML='';};
-
+window.overlayClose=function(e){if(e.target.id==='moverlay')closeModal();};
+window.closeModal=function(){document.getElementById('modal-root').innerHTML='';};
 </script>
 </body>
 </html>
