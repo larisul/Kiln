@@ -54,7 +54,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ftag.correction{background:#fce4ec;color:#b71c1c;border:0.5px solid #ef9a9a;}
 .nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
 .nav-btn{background:var(--bg2);border:0.5px solid var(--border);color:var(--text2);width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;}
-.months-wrap{display:flex;flex-direction:column;gap:24px;}
+.months-wrap{display:flex;flex-direction:column;gap:24px;}@media(min-width:700px){.months-wrap{flex-direction:row;}.month-block{flex:1;}}
 .month-block{background:var(--bg);border-radius:var(--radius);border:0.5px solid var(--border);padding:12px;}
 .month-block h2{font-size:13px;font-weight:600;color:var(--text);margin-bottom:10px;text-align:center;letter-spacing:.02em;}
 .weekdays{display:grid;grid-template-columns:repeat(7,1fr);margin-bottom:4px;}
@@ -235,7 +235,7 @@ const firebaseConfig = {
   appId: "1:928635678896:web:ec178ccfd39eae9b648b75"
 };
 
-const TEAM_PASSWORD = "gruni";
+const TEAM_PASSWORD = "roz";
 const SESSION_KEY = "kiln_auth";
 
 const fbApp = initializeApp(firebaseConfig);
